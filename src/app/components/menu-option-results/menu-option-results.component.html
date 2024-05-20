@@ -1,0 +1,11 @@
+@if ((isGuessCorrect$ | async)) {
+    <h3>Congratulations! You guessed correctly!</h3>
+    <p>Good job! Select again to start a new round.</p>
+} @else {
+    <h3>Try again!</h3>
+    <p>Unfortunately, you guessed incorrectly. Try again.</p>
+
+    <p>Correct Answer: {{ selectedFile$ | async }}</p>
+}
+
+<button mat-raised-button color="primary" (click)="newRound()">Again!</button>

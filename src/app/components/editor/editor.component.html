@@ -1,0 +1,20 @@
+<div class="tabs-container">
+    @if (fileName$ | async) {
+        <div class="tab">
+            @if ((state$ | async) !== 'Game') {
+                <p>{{ fileName$ | async }}</p>
+            } @else {
+                <p>???</p>
+            }
+        </div>
+    }
+
+    <div class="right">
+        <ng-content select="branding"></ng-content>
+    </div>
+</div>
+@if (model$ | async) {
+    <ngx-monaco-editor [options]="editorOptions" [model]="(model$ | async)!"></ngx-monaco-editor>
+} @else if(isLoading$ | async) {
+    <mat-spinner></mat-spinner>
+}

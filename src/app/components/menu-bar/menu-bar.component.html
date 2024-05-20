@@ -1,0 +1,30 @@
+
+<mat-tab-group
+    class="tab-group"
+    color="primary"
+    mat-stretch-tabs="false"
+    animationDuration="0ms"
+    [(selectedIndex)]="selectedOptionIndex"
+>
+    @for (option of menuOptions; track option; let idx = $index) {
+        <mat-tab [disabled]="selectedOptionIndex !== idx">
+            <ng-template mat-tab-label>
+                <mat-icon [matTooltip]="option.name | titlecase" matTooltipPosition="right">{{ option.tabIcon }}</mat-icon>
+            </ng-template>
+        </mat-tab>
+    }
+</mat-tab-group>
+<div class="content" #content>
+    <h3 class="option">{{ (menuOptions ? menuOptions[selectedOptionIndex].name : '') | titlecase }}</h3>
+    <div class="content-choice">
+        <app-menu-option-explorer
+            [style.display]="selectedOptionIndex === 0 ? 'block' : 'none'"
+        ></app-menu-option-explorer>
+        <app-menu-option-game
+            [style.display]="selectedOptionIndex === 1 ? 'block' : 'none'"
+        ></app-menu-option-game>
+        <app-menu-option-results
+            [style.display]="selectedOptionIndex === 2 ? 'block' : 'none'"
+        ></app-menu-option-results>
+    </div>
+</div>

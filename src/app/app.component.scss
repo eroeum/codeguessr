@@ -1,0 +1,34 @@
+app-menu-bar {
+    height: 100%;
+}
+
+app-editor {
+    width: 100%;
+    height: 100%;
+}
+
+.side-content {
+    height: 100%;
+    display: flex;
+}
+
+.branding {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    padding: 4px;
+
+    h3 {
+        margin: 0;
+    }
+}
+
+.loading {
+    height: 100%;
+    width: 100%;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}

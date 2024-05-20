@@ -1,0 +1,37 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "codeguessr"
+version = "0.0.1"
+description = "Simple game to help explore a code-base."
+readme = "README.md"
+requires-python = ">3.8"
+license = {file = "LICENSE.txt"}
+keywords = []
+authors = [
+    { name = "Eric Roeum", email = "eroeum@gmail.com" }
+]
+dependencies = [
+    "flask",
+    "flask-bootstrap",
+    "flask-cors",
+    "flask-smorest",
+    "gitpython",
+    "hatchling",
+]
+
+[project.scripts]
+codeguessr = "app:main"
+
+[tool.hatch.build]
+ignore-vcs = true
+artifacts = ["app/public"]
+
+[tool.hatch.build.hooks.custom]
+[tool.hatch.build.targets.wheel]
+artifacts = [
+    "app/public",
+]
+include = ["/app"]

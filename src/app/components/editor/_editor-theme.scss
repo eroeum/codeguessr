@@ -1,0 +1,27 @@
+@use 'sass:map';
+@use '@angular/material' as mat;
+
+@mixin color($theme) {
+    .tabs-container {
+        background-color: mat.get-theme-color($theme, background, default);
+        border-bottom: 1px solid mat.get-theme-color($theme, accent, default);
+    }
+
+    .tab {
+        border-top: 2px solid mat.get-theme-color($theme, primary, default);
+        border-right: 1px solid mat.get-theme-color($theme, accent, default);
+    }
+}
+
+@mixin typography($theme) {
+}
+
+@mixin theme($theme) {
+    @if mat.theme-has($theme, color) {
+        @include color($theme);
+    }
+  
+    @if mat.theme-has($theme, typography) {
+        @include typography($theme);
+    }
+}

@@ -1,0 +1,45 @@
+.tree-invisible {
+    display: none;
+}
+
+.tree ul,
+.tree li {
+    margin-top: 0;
+    margin-bottom: 0;
+    list-style-type: none;
+}
+
+.tree .mat-nested-tree-node div[role=group] {
+    padding-left: 24px;
+}
+
+.tree div[role=group] {
+    padding-left: 24px;
+}
+
+.mat-tree-node {
+    cursor: pointer;
+    min-height: 24px;
+}
+
+.mat-toggle {
+    width: 24px !important;
+    height: 24px !important;
+    padding: 0px !important;
+    display: inline-flex !important;
+    align-items: center;
+    justify-content: center;
+
+    .mat-mdc-button-touch-target {
+        width: 24px !important;
+        height: 24px !important;
+    }
+}
+
+.files-list {
+    padding-bottom: 60px;
+}
+
+button {
+    width: 100%;
+}
