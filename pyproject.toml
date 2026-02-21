@@ -4,34 +4,103 @@ build-backend = "hatchling.build"
 
 [project]
 name = "codeguessr"
-version = "0.0.1"
-description = "Simple game to help explore a code-base."
+version = "0.1.0"
+description = "A GeoGuessr-style browser game for code"
 readme = "README.md"
-requires-python = ">3.8"
-license = {file = "LICENSE.txt"}
-keywords = []
-authors = [
-    { name = "Eric Roeum", email = "eroeum@gmail.com" }
+requires-python = ">=3.11"
+license = { text = "MIT" }
+classifiers = [
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Operating System :: OS Independent",
+    "Environment :: Web Environment",
+    "Topic :: Games/Entertainment",
 ]
 dependencies = [
-    "flask",
-    "flask-bootstrap",
-    "flask-cors",
-    "flask-smorest",
-    "gitpython",
-    "hatchling",
+    "fastapi>=0.110",
+    "uvicorn[standard]>=0.29",
+    "click>=8.1",
+    "pathspec>=0.12",
 ]
+
+[project.urls]
+Homepage = "https://github.com/eroeum/codeguessr"
+Source = "https://github.com/eroeum/codeguessr"
+Issues = "https://github.com/eroeum/codeguessr/issues"
 
 [project.scripts]
-codeguessr = "app:main"
+codeguessr = "codeguessr.cli:main"
 
-[tool.hatch.build]
-ignore-vcs = true
-artifacts = ["app/public"]
-
-[tool.hatch.build.hooks.custom]
-[tool.hatch.build.targets.wheel]
-artifacts = [
-    "app/public",
+[project.optional-dependencies]
+dev = [
+    "pytest",
+    "httpx",
+    "playwright",
+    "ruff",
+    "mypy",
 ]
-include = ["/app"]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/codeguessr"]
+
+[tool.hatch.build.targets.wheel.force-include]
+"src/codeguessr/static" = "codeguessr/static"
+
+[tool.hatch.build.targets.sdist]
+exclude = ["src/codeguessr/static"]
+
+[tool.hatch.publish]
+url = "https://upload.pypi.org/legacy/"
+
+# ---------------------------------------------------------------------------
+# Ruff — linter + formatter
+# ---------------------------------------------------------------------------
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.ruff.lint]
+select = [
+    "E",   # pycodestyle errors
+    "W",   # pycodestyle warnings
+    "F",   # pyflakes
+    "I",   # isort
+    "UP",  # pyupgrade — enforce Python 3.11+ idioms
+    "B",   # flake8-bugbear — catches real bugs
+    "C4",  # flake8-comprehensions — prefer list/dict/set comprehensions
+    "N",   # pep8-naming
+    "RUF", # ruff-specific rules
+]
+ignore = [
+    "N802",   # function name should be lowercase (conflicts with pytest fixtures)
+    "RUF012", # mutable class attributes — dataclasses use field() explicitly
+]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**" = [
+    "N803",  # argument name should be lowercase (fixture names passed as args)
+]
+
+[tool.ruff.lint.isort]
+known-first-party = ["codeguessr"]
+
+# ---------------------------------------------------------------------------
+# Mypy — static type checker
+# ---------------------------------------------------------------------------
+
+[tool.mypy]
+python_version = "3.11"
+strict = true
+ignore_missing_imports = true   # third-party stubs (pathspec, uvicorn, …)
+files = ["src"]
+
+# ---------------------------------------------------------------------------
+# Pytest
+# ---------------------------------------------------------------------------
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

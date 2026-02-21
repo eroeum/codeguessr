@@ -1,0 +1,101 @@
+<div class="vscode">
+
+  <!-- Title Bar -->
+  <header class="titlebar">
+    <div class="traffic-lights">
+      <span class="tl red"></span>
+      <span class="tl yellow"></span>
+      <span class="tl green"></span>
+    </div>
+    <span class="titlebar-text">CodeGuessr — Results</span>
+  </header>
+
+  <!-- Workbench -->
+  <div class="workbench">
+
+    <!-- Activity Bar -->
+    <nav class="activitybar">
+      <button class="ab-item ab-active" title="Explorer">
+        <svg viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+          <path d="M13.5 1H7.71L6.86.15 6.5 0h-5l-.5.5v13l.5.5h12l.5-.5V1.5L13.5 1zM13 14H2V1h4v3.5l.5.5H13v9zM7 1.21 11.79 5H7V1.21z"/>
+        </svg>
+      </button>
+    </nav>
+
+    <!-- Editor -->
+    <main class="editor-group">
+
+      <!-- Tab -->
+      <div class="tabs">
+        <div class="tab tab-active">
+          <svg class="tab-file-icon" viewBox="0 0 16 16" fill="#cccccc" xmlns="http://www.w3.org/2000/svg">
+            <path d="M13.5 1H7.71L6.86.15 6.5 0h-5l-.5.5v13l.5.5h12l.5-.5V1.5L13.5 1zM13 14H2V1h4v3.5l.5.5H13v9zM7 1.21 11.79 5H7V1.21z"/>
+          </svg>
+          <span class="tab-title">RESULTS.md</span>
+          <span class="tab-close">✕</span>
+        </div>
+      </div>
+
+      <!-- Breadcrumb -->
+      <div class="breadcrumb">
+        <span class="bc-item">codeguessr</span>
+        <span class="bc-sep">›</span>
+        <span class="bc-item bc-leaf">RESULTS.md</span>
+      </div>
+
+      <!-- Result Content -->
+      <div class="editor-body">
+        @if (result) {
+          <div class="result-doc">
+
+            <!-- Total score -->
+            <div class="total-score-box">
+              <span class="ts-label">Final Score</span>
+              <span class="ts-value">{{ result.totalScore }}</span>
+              <span class="ts-pts">pts</span>
+            </div>
+
+            <!-- Per-round breakdown -->
+            <table class="rounds-table">
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>File</th>
+                  <th>Result</th>
+                  <th>Points</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (round of result.rounds; track round.round_num) {
+                  <tr>
+                    <td class="rn-num">{{ round.round_num }}</td>
+                    <td><code class="filepath">{{ round.target_file }}</code></td>
+                    <td class="verdict-cell" [class.correct]="round.correct" [class.failed]="!round.correct">
+                      {{ round.correct ? '✓ Correct' : '✗ Missed' }}
+                    </td>
+                    <td class="pts-cell" [class.nonzero]="round.points > 0">{{ round.points }}</td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+
+            <button class="play-btn" (click)="playAgain()">▶  Play Again</button>
+
+          </div>
+        }
+      </div>
+
+    </main>
+  </div>
+
+  <!-- Status Bar -->
+  <footer class="statusbar">
+    <div class="sb-left">
+      <span class="sb-item">⚡ CodeGuessr</span>
+    </div>
+    <div class="sb-right">
+      <span class="sb-item">UTF-8</span>
+    </div>
+  </footer>
+
+</div>
