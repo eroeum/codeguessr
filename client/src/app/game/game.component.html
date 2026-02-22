@@ -1,0 +1,231 @@
+<div class="vscode">
+
+  <!-- Workbench -->
+  <div class="workbench">
+
+    <!-- Activity Bar -->
+    <nav class="activitybar">
+      <button class="ab-item ab-active" title="Explorer">
+        <svg viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+          <path d="M13.5 1H7.71L6.86.15 6.5 0h-5l-.5.5v13l.5.5h12l.5-.5V1.5L13.5 1zM13 14H2V1h4v3.5l.5.5H13v9zM7 1.21 11.79 5H7V1.21z"/>
+        </svg>
+      </button>
+    </nav>
+
+    <!-- Sidebar -->
+    <aside class="sidebar">
+
+      <div class="sb-header">
+        <span class="sb-title">EXPLORER</span>
+        <div class="sb-header-actions">
+          <button class="sb-action-btn" title="Collapse All Folders" (click)="collapseAll()">
+            <svg viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+              <path d="M9 9H4v5h5V9zM9 2H4v5h5V2zM3 1H1.5A.5.5 0 0 0 1 1.5V7h2V1zm7 0v6h2V1.5A.5.5 0 0 0 11.5 1H10zM1 9v5.5a.5.5 0 0 0 .5.5H3V9H1zm9 0v6h1.5a.5.5 0 0 0 .5-.5V9h-2z"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <div class="sb-search">
+        <svg class="sb-search-icon" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+          <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398l3.85 3.85a1 1 0 0 0 1.415-1.415l-3.85-3.85a1.007 1.007 0 0 0-.018-.983zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"/>
+        </svg>
+        <input
+          class="sb-search-input"
+          type="text"
+          placeholder="Filter files..."
+          [value]="searchQuery"
+          (input)="onSearch($event)"
+        />
+        @if (searchQuery) {
+          <button class="sb-search-clear" title="Clear" (click)="searchQuery = ''">
+            <svg viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+              <path d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8 2.146 2.854z"/>
+            </svg>
+          </button>
+        }
+      </div>
+
+      <div class="sb-section">
+        <div class="sb-section-header">
+          <span class="chevron">▾</span>GUESS THE FILE
+        </div>
+
+        <div class="sb-tree">
+          @if (loading) {
+            <div class="sb-empty">Loading...</div>
+          } @else if (visibleRows.length === 0 && searchQuery) {
+            <div class="sb-empty">No results for "{{ searchQuery }}"</div>
+          } @else {
+            @for (row of visibleRows; track row.fullPath) {
+              @if (row.isDir) {
+                <div
+                  class="tree-row dir-row"
+                  role="button"
+                  tabindex="0"
+                  [style.paddingLeft.px]="row.depth * 16 + 8"
+                  (click)="toggleDir(row.fullPath)"
+                  (keydown.enter)="toggleDir(row.fullPath)"
+                  (keydown.space)="toggleDir(row.fullPath)"
+                >
+                  <svg class="tree-chevron" [class.expanded]="!collapsedDirs.has(row.fullPath)" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M5.7 3.5l5 4.5-5 4.5" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"/>
+                  </svg>
+                  <svg class="tree-icon" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M1 4.5A1.5 1.5 0 0 1 2.5 3H5.8L7 4.5H13.5A1.5 1.5 0 0 1 15 6v6a1.5 1.5 0 0 1-1.5 1.5h-11A1.5 1.5 0 0 1 1 12V4.5z" fill="#dcb67a"/>
+                  </svg>
+                  <span class="tree-name">{{ row.name }}</span>
+                </div>
+              } @else {
+                <button
+                  class="tree-row file-row"
+                  [style.paddingLeft.px]="row.depth * 16 + (searchQuery.trim() ? 8 : 24)"
+                  [class.wrong]="isWrong(row.fullPath)"
+                  [disabled]="guessing || loading || isWrong(row.fullPath) || roundOver"
+                  (click)="guess(row.fullPath)"
+                  [title]="row.fullPath"
+                >
+                  <svg class="tree-icon file-icon" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" [style.color]="getFileColor(getExt(row.fullPath))">
+                    <path d="M4 1h6.5L14 4.5V14a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1z" fill="currentColor"/>
+                    <path d="M10 1v3.5h3.5" stroke="rgba(0,0,0,0.3)" stroke-width="0.8"/>
+                  </svg>
+                  <span class="tree-name-col">
+                    <span class="tree-filename">{{ row.name }}</span>
+                    @if (searchQuery.trim() && getDirName(row.fullPath)) {
+                      <span class="tree-dir-hint">{{ getDirName(row.fullPath) }}</span>
+                    }
+                  </span>
+                  @if (isWrong(row.fullPath)) {
+                    <span class="wrong-x">✗</span>
+                  }
+                </button>
+              }
+            }
+          }
+        </div>
+      </div>
+    </aside>
+
+    <!-- Editor Group -->
+    <main class="editor-group">
+
+      <!-- Tab Bar -->
+      <div class="tabs">
+        @for (n of roundNums; track n) {
+          <div class="tab"
+               [class.tab-active]="!isRoundCompleted(n) && n === roundNum"
+               [class.tab-correct]="isRoundCorrect(n)"
+               [class.tab-failed]="isRoundFailed(n)"
+               [class.tab-upcoming]="n > roundNum && !isRoundCompleted(n)">
+            <svg class="tab-file-icon" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+              <path d="M13.5 1H7.71L6.86.15 6.5 0h-5l-.5.5v13l.5.5h12l.5-.5V1.5L13.5 1zM13 14H2V1h4v3.5l.5.5H13v9zM7 1.21 11.79 5H7V1.21z"/>
+            </svg>
+            <span class="tab-title">{{ getTabTitle(n) }}</span>
+            @if (isRoundCorrect(n)) {
+              <span class="tab-badge correct">✓</span>
+            } @else if (isRoundFailed(n)) {
+              <span class="tab-badge failed">✕</span>
+            } @else {
+              <span class="tab-close">✕</span>
+            }
+          </div>
+        }
+        <div class="tab-spacer"></div>
+        <div class="score-display">
+          <span class="score-label">Total</span>
+          <span class="score-value">{{ totalScore }}</span>
+          <span class="score-pts">pts</span>
+        </div>
+      </div>
+
+      <!-- Breadcrumb -->
+      <div class="breadcrumb">
+        <span class="bc-item">codeguessr</span>
+        <span class="bc-sep">›</span>
+        <span class="bc-item">Round {{ roundNum }} of {{ totalRounds }}</span>
+        <span class="bc-sep">›</span>
+        <span class="bc-item bc-leaf">{{ getTabTitle(roundNum) }}</span>
+      </div>
+
+      <!-- Editor -->
+      <div class="editor-body">
+        @if (error) {
+          <div class="editor-error">
+            <div class="error-icon">⚠</div>
+            <div class="error-message">{{ error }}</div>
+            <a class="error-back" [routerLink]="['/']">← Back to Settings</a>
+          </div>
+        } @else if (loading) {
+          <div class="editor-placeholder">Loading snippet...</div>
+        } @else {
+          <div class="editor-scroll">
+            <div class="gutter">
+              @for (line of codeLines; track $index) {
+                <div class="ln" [class.highlighted-ln]="$index === highlightLine">
+                  {{ $index + 1 }}
+                </div>
+              }
+            </div>
+            <div class="editor-lines">
+              @for (line of codeLines; track $index) {
+                <div class="code-line" [class.highlighted]="$index === highlightLine" [innerHTML]="line"></div>
+              }
+            </div>
+          </div>
+
+          <!-- Round completion overlay -->
+          @if (roundOver && completedRoundInfo) {
+            <div class="round-overlay">
+              <div class="round-card">
+                <div class="round-verdict"
+                     [class.correct]="completedRoundInfo.correct"
+                     [class.failed]="!completedRoundInfo.correct">
+                  @if (completedRoundInfo.correct) {
+                    ✓ Correct!
+                  } @else {
+                    ✗ Out of guesses
+                  }
+                </div>
+                <div class="round-info">
+                  <div class="ri-label">The file was</div>
+                  <code class="ri-file">{{ completedRoundInfo.target_file }}</code>
+                </div>
+                <div class="round-points-row">
+                  <span class="rp-earned" [class.nonzero]="completedRoundInfo.round_points > 0">
+                    +{{ completedRoundInfo.round_points }} pts
+                  </span>
+                  <span class="rp-total">Total: {{ totalScore }} pts</span>
+                </div>
+                @if (gameOver) {
+                  <button class="next-btn" (click)="showResults()">See Results</button>
+                } @else {
+                  <button class="next-btn" (click)="nextRound()">Next Round →</button>
+                }
+              </div>
+            </div>
+          }
+        }
+      </div>
+
+    </main>
+  </div>
+
+  <!-- Status Bar -->
+  <footer class="statusbar">
+    <div class="sb-left">
+      <span class="sb-item">⚡ CodeGuessr</span>
+      <span class="sb-sep">|</span>
+      <span class="sb-item">Round {{ roundNum }} / {{ totalRounds }}</span>
+      <span class="sb-sep">|</span>
+      <span class="sb-item sb-guesses" [class.sb-danger]="guessesRemaining <= 2">
+        {{ guessesRemaining }} / {{ maxGuesses }} guesses remaining
+      </span>
+    </div>
+    <div class="sb-right">
+      <span class="sb-item">Ln {{ highlightLine + 1 }}</span>
+      <span class="sb-sep">|</span>
+      <span class="sb-item">UTF-8</span>
+    </div>
+  </footer>
+
+</div>
